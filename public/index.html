@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gewinnspiel Helfer - Admin</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+    }
+    a {
+      text-decoration: none;
+      color: #007bff;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    button {
+      font-size: 1em;
+      padding: 10px 20px;
+      margin: 5px 0;
+      width: 100%;
+      cursor: pointer;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+      border: 1px solid #ddd;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+    li {
+      padding: 5px 10px;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎲 Gewinnspiel Helfer (Admin)</h1>
+
+  <p>
+    <a href="/teilnahme.html" target="_blank" style="display: inline-block; margin-bottom: 15px; font-weight: bold;">
+      ➡️ Link zur Teilnahme am Gewinnspiel
+    </a>
+  </p>
+
+  <button onclick="startGewinnspiel()">🎉 Gewinner ermitteln</button>
+  <button onclick="reset()">🧹 Teilnehmerliste löschen</button>
+
+  <p id="result"></p>
+
+  <h3>Aktuelle Teilnehmer:</h3>
+  <ul id="teilnehmerlisteAdmin">
+    <li>Lade Teilnehmer...</li>
+  </ul>
+
+  <script>
+    async function startGewinnspiel() {
+      const res = await fetch('/gewinner');
+      const text = await res.text();
+      document.getElementById('result').innerText = text;
+    }
+
+    async function reset() {
+      const confirmDelete = confirm("Bist du sicher, dass du die Teilnehmerliste löschen willst?");
+      if (!confirmDelete) return;
+
+      const res = await fetch('/reset', { method: 'POST' });
+      const text = await res.text();
+      document.getElementById('result').innerText = text;
+      ladeTeilnehmerAdmin(); // Liste nach Löschen aktualisieren
+    }
+
+    async function ladeTeilnehmerAdmin() {
+      const res = await fetch('/teilnehmerliste');
+      if (!res.ok) {
+        document.getElementById('teilnehmerlisteAdmin').innerHTML = '<li>Fehler beim Laden der Teilnehmer.</li>';
+        return;
+      }
+      const teilnehmer = await res.json();
+      if (teilnehmer.length === 0) {
+        document.getElementById('teilnehmerlisteAdmin').innerHTML = '<li>Keine Teilnehmer vorhanden.</li>';
+        return;
+      }
+      document.getElementById('teilnehmerlisteAdmin').innerHTML = teilnehmer
+        .map(name => `<li>${name}</li>`)
+        .join('');
+    }
+
+    // Teilnehmerliste direkt beim Laden anzeigen
+    ladeTeilnehmerAdmin();
+  </script>
+</body>
+</html>

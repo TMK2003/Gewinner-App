@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teilnahme am Gewinnspiel</title>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; }
+    input, button { font-size: 1em; padding: 8px; margin-top: 10px; width: 100%; }
+    ul { list-style: none; padding-left: 0; }
+    li { padding: 5px 0; border-bottom: 1px solid #ddd; }
+  </style>
+</head>
+<body>
+  <h1>🎉 Gewinnspiel Teilnahme</h1>
+
+  <form id="teilnahmeForm">
+    <label for="name">Dein Name:</label>
+    <input type="text" id="name" name="name" required autocomplete="off" />
+    <button type="submit">Teilnehmen</button>
+  </form>
+
+  <p id="meldung"></p>
+
+  <h3>Aktuelle Teilnehmer:</h3>
+  <ul id="teilnehmerliste">
+    <li>Lade Teilnehmer...</li>
+  </ul>
+
+  <script>
+    document.getElementById('teilnahmeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nameInput = document.getElementById('name');
+      const name = nameInput.value.trim();
+      if (!name) return;
+
+      const res = await fetch('/teilnehmen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ name })
+      });
+
+      const text = await res.text();
+      document.getElementById('meldung').innerText = text;
+
+      if (text.startsWith('✅')) {
+        nameInput.value = '';
+        ladeTeilnehmer();
+      }
+    });
+
+    async function ladeTeilnehmer() {
+      const res = await fetch('/teilnehmerliste');
+      if (!res.ok) {
+        document.getElementById('teilnehmerliste').innerHTML = '<li>Fehler beim Laden der Teilnehmer.</li>';
+        return;
+      }
+      const teilnehmer = await res.json();
+      if (teilnehmer.length === 0) {
+        document.getElementById('teilnehmerliste').innerHTML = '<li>Noch keine Teilnehmer.</li>';
+        return;
+      }
+      document.getElementById('teilnehmerliste').innerHTML = teilnehmer
+        .map(name => `<li>${name}</li>`)
+        .join('');
+    }
+
+    ladeTeilnehmer();
+  </script>
+</body>
+</html>

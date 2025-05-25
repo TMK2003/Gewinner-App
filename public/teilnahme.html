@@ -6,7 +6,7 @@
   <style>
     body { font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; }
     input, button { font-size: 1em; padding: 8px; margin-top: 10px; width: 100%; }
-    ul { list-style: none; padding-left: 0; }
+    ol { padding-left: 20px; }
     li { padding: 5px 0; border-bottom: 1px solid #ddd; }
   </style>
 </head>
@@ -22,9 +22,9 @@
   <p id="meldung"></p>
 
   <h3>Aktuelle Teilnehmer:</h3>
-  <ul id="teilnehmerliste">
+  <ol id="teilnehmerliste">
     <li>Lade Teilnehmer...</li>
-  </ul>
+  </ol>
 
   <script>
     document.getElementById('teilnahmeForm').addEventListener('submit', async (e) => {

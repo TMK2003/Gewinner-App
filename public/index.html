@@ -53,6 +53,7 @@
   <p id="result"></p>
 
   <h3>Aktuelle Teilnehmer:</h3>
+  <p id="teilnehmerAnzahl">Anzahl: 0</p>
   <ul id="teilnehmerlisteAdmin">
     <li>Lade Teilnehmer...</li>
   </ul>
@@ -71,26 +72,27 @@
       const res = await fetch('/reset', { method: 'POST' });
       const text = await res.text();
       document.getElementById('result').innerText = text;
-      ladeTeilnehmerAdmin(); // Liste nach Löschen aktualisieren
+      ladeTeilnehmerAdmin();
     }
 
     async function ladeTeilnehmerAdmin() {
       const res = await fetch('/teilnehmerliste');
       if (!res.ok) {
         document.getElementById('teilnehmerlisteAdmin').innerHTML = '<li>Fehler beim Laden der Teilnehmer.</li>';
+        document.getElementById('teilnehmerAnzahl').innerText = 'Anzahl: 0';
         return;
       }
       const teilnehmer = await res.json();
       if (teilnehmer.length === 0) {
         document.getElementById('teilnehmerlisteAdmin').innerHTML = '<li>Keine Teilnehmer vorhanden.</li>';
+        document.getElementById('teilnehmerAnzahl').innerText = 'Anzahl: 0';
         return;
       }
-      document.getElementById('teilnehmerlisteAdmin').innerHTML = teilnehmer
-        .map(name => `<li>${name}</li>`)
-        .join('');
+      document.getElementById('teilnehmerlisteAdmin').innerHTML = teilnehmer.map(name => `<li>${name}</li>`).join('');
+      document.getElementById('teilnehmerAnzahl').innerText = `Anzahl: ${teilnehmer.length}`;
     }
 
-    // Teilnehmerliste direkt beim Laden anzeigen
+    // Direkt beim Laden Teilnehmer holen
     ladeTeilnehmerAdmin();
   </script>
 </body>
